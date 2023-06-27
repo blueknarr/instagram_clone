@@ -13,9 +13,16 @@ class CreatePage extends StatefulWidget {
 
 class _CreatePageState extends State<CreatePage> {
   final model = CreateModel();
+  final _titleTextController = TextEditingController();
 
   /// ? : 초기 null을 허용한다.
   File? _image;
+
+  @override
+  void dispose() {
+    _titleTextController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +31,15 @@ class _CreatePageState extends State<CreatePage> {
         title: Text('새 게시물'),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () {
+              // 이미지 피커 실행
+              if (_image != null && _titleTextController.text.isNotEmpty) {
+                model.uploadPost(
+                  _titleTextController.text,
+                  _image!,
+                );
+              }
+            },
             icon: const Icon(Icons.send),
           ),
         ],
@@ -37,6 +52,7 @@ class _CreatePageState extends State<CreatePage> {
           child: Column(
             children: [
               TextField(
+                controller: _titleTextController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16.0),

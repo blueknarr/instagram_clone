@@ -42,8 +42,11 @@ class DetailPostPage extends StatelessWidget {
                 ],
               ),
             ),
-            Image.network(
-              post.imageUrl,
+            Hero(
+              tag: post.id,
+              child: Image.network(
+                post.imageUrl,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),

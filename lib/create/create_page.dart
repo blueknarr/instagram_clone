@@ -18,6 +18,8 @@ class _CreatePageState extends State<CreatePage> {
   /// ? : 초기 null을 허용한다.
   File? _image;
 
+  bool isLoading = false;
+
   @override
   void dispose() {
     _titleTextController.dispose();
@@ -31,13 +33,28 @@ class _CreatePageState extends State<CreatePage> {
         title: Text('새 게시물'),
         actions: [
           IconButton(
-            onPressed: () {
+            onPressed: () async {
               // 이미지 피커 실행
               if (_image != null && _titleTextController.text.isNotEmpty) {
-                model.uploadPost(
+                setState(() {
+                  isLoading = true;
+                });
+
+                /// 업로드
+                await model.uploadPost(
                   _titleTextController.text,
                   _image!,
                 );
+
+                setState(() {
+                  isLoading = false;
+                });
+
+                /// 화면이 살아있다면 업로드가 끝나고 뒤로 이동
+                /// async ~ await 코드에서 사용
+                if (mounted) {
+                  Navigator.pop(context);
+                }
               }
             },
             icon: const Icon(Icons.send),
@@ -64,6 +81,7 @@ class _CreatePageState extends State<CreatePage> {
                 ),
               ),
               const SizedBox(height: 20),
+              if (isLoading) const CircularProgressIndicator(),
               ElevatedButton(
                 onPressed: () async {
                   _image = await model.getImage();

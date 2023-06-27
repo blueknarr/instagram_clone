@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/tab/search/search_model.dart';
 
 import '../../create/create_page.dart';
+import '../../domain/post.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({Key? key}) : super(key: key);
@@ -14,6 +17,8 @@ class SearchPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final model = SearchModel();
+
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -28,29 +33,43 @@ class SearchPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Instagram Clone'),
       ),
-      body: GridView.builder(
-        /// 사진의 개수를 알려줘야 한다.
-        itemCount: _urls.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          /// 열의 개수
-          crossAxisCount: 3,
+      body: StreamBuilder<QuerySnapshot<Post>>(
+          stream: model.postsStream,
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return const Text('알 수 없는 에러');
+            }
 
-          /// 상하 간격
-          mainAxisSpacing: 2,
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            List<Post> posts =
+                snapshot.data!.docs.map((post) => post.data()).toList();
 
-          /// 좌우 간격
-          crossAxisSpacing: 2,
-        ),
-        itemBuilder: (BuildContext context, int index) {
-          final url = _urls[index];
+            return GridView.builder(
+              /// 사진의 개수를 알려줘야 한다.
+              itemCount: posts.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                /// 열의 개수
+                crossAxisCount: 3,
 
-          /// Grid는 사진의 사이즈를 설정하지 않아도 자동으로 정사각형 사이즈로 설정
-          return Image.network(
-            url,
-            fit: BoxFit.cover,
-          );
-        },
-      ),
+                /// 상하 간격
+                mainAxisSpacing: 2,
+
+                /// 좌우 간격
+                crossAxisSpacing: 2,
+              ),
+              itemBuilder: (BuildContext context, int index) {
+                final post = posts[index];
+
+                /// Grid는 사진의 사이즈를 설정하지 않아도 자동으로 정사각형 사이즈로 설정
+                return Image.network(
+                  post.imageUrl,
+                  fit: BoxFit.cover,
+                );
+              },
+            );
+          }),
     );
   }
 }

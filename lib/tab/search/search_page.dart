@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:instagram_clone/tab/search/search_model.dart';
 
 import '../../create/create_page.dart';
+import '../../detail_post/detail_post_page.dart';
 import '../../domain/post.dart';
 
 class SearchPage extends StatelessWidget {
@@ -63,9 +64,18 @@ class SearchPage extends StatelessWidget {
                 final post = posts[index];
 
                 /// Grid는 사진의 사이즈를 설정하지 않아도 자동으로 정사각형 사이즈로 설정
-                return Image.network(
-                  post.imageUrl,
-                  fit: BoxFit.cover,
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => DetailPostPage(post: post)),
+                    );
+                  },
+                  child: Image.network(
+                    post.imageUrl,
+                    fit: BoxFit.cover,
+                  ),
                 );
               },
             );
